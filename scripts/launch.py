@@ -285,7 +285,7 @@ def setup_tunnels(tunnel_port):
             ipySys(f"ngrok config add-authtoken {ngrok_token}")
 
         services.append(('Ngrok', {
-            'command': f"ngrok http http://localhost:{tunnel_port} --log stdout",
+            'command': f"ngrok http http://localhost:{tunnel_port} --log-format=term",
             'pattern': r'https://[\w-]+\.(?:ngrok-free\.app|ngrok\.app|ngrok\.io)'
         }))
 
