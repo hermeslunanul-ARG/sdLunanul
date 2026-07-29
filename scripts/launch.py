@@ -381,6 +381,19 @@ if __name__ == '__main__':
 
         print(f"🔧 WebUI: {COL.B}{UI}{COL.X}")
 
+        # ── Ngrok fallback: query local API if regex didn't capture the URL ──
+        import urllib.request, json as _json
+        try:
+            _resp = urllib.request.urlopen('http://localhost:4040/api/tunnels', timeout=5)
+            _data = _json.loads(_resp.read())
+            if _data.get('tunnels'):
+                for _t in _data['tunnels']:
+                    _url = _t.get('public_url', '')
+                    if _url and not any(_url == u[0] for u in tunneling_service.urls):
+                        print(f"\n{COL.G}🔗 Tunnel Ngrok       URL: {COL.X}{_url}")
+        except Exception:
+            pass  # ngrok API not available
+
         try:
             ipySys(LAUNCHER)
         except KeyboardInterrupt:
