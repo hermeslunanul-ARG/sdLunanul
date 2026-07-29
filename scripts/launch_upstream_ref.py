@@ -286,7 +286,7 @@ def setup_tunnels(tunnel_port):
 
         services.append(('Ngrok', {
             'command': f"ngrok http http://localhost:{tunnel_port} --log stdout",
-            'pattern': r'https://[\w-]+\.(?:ngrok-free\.app|ngrok\.app|ngrok\.io)'
+            'pattern': r'https://[\w-]+\.ngrok-free\.app'
         }))
 
     # Check command availability
@@ -380,19 +380,6 @@ if __name__ == '__main__':
                 print(f"{COL.B}>> 🏷️ Selected Tagger: {COL.lB}{selected_tagger}{COL.X} ({tag_file})\n")
 
         print(f"🔧 WebUI: {COL.B}{UI}{COL.X}")
-
-        # ── Ngrok URL via local API (more reliable than parsing stdout) ──
-        import urllib.request as _ur
-        import json as _js
-        try:
-            _req = _ur.urlopen('http://localhost:4040/api/tunnels', timeout=3)
-            _tunnels = _js.loads(_req.read()).get('tunnels', [])
-            for _t in _tunnels:
-                _u = _t.get('public_url', '')
-                if _u:
-                    print(f"\n{COL.G}🔗 Tunnel Ngrok       URL: {COL.X}{_u}")
-        except Exception:
-            pass
 
         try:
             ipySys(LAUNCHER)
