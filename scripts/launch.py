@@ -286,7 +286,7 @@ def setup_tunnels(tunnel_port):
 
         services.append(('Ngrok', {
             'command': f"ngrok http http://localhost:{tunnel_port} --log stdout",
-            'pattern': r'https://[\w-]+\.ngrok-free\.app'
+            'pattern': r'https://[\w-]+\.(?:ngrok-free\.app|ngrok\.app|ngrok\.io)'
         }))
 
     # Check command availability
