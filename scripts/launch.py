@@ -285,7 +285,7 @@ def setup_tunnels(tunnel_port):
             ipySys(f"ngrok config add-authtoken {ngrok_token}")
 
         services.append(('Ngrok', {
-            'command': f"ngrok http http://localhost:{tunnel_port} --log-format=term",
+            'command': f"ngrok http http://localhost:{tunnel_port} --log=stdout --log-format=term",
             'pattern': r'https://[\w-]+\.(?:ngrok-free\.app|ngrok\.app|ngrok\.io)'
         }))
 
@@ -322,7 +322,7 @@ if __name__ == '__main__':
     available_tunnels, total, success, unavailable = setup_tunnels(tunnel_port)
 
     # Setup tunneling service
-    tunneling_service = Tunnel(tunnel_port, check_command_available=False)
+    tunneling_service = Tunnel(tunnel_port, check_command_available=False, timeout=60)
     tunneling_service.logger.setLevel(logging.DEBUG if args.log else logging.INFO)
 
     for name, config in available_tunnels:
