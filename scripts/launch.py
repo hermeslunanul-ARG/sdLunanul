@@ -406,6 +406,8 @@ if __name__ == '__main__':
                     pass
                 if _attempt < 5:
                     _time.sleep(5)
+        else:
+            print(f"{COL.Y}⚠️ ngrok: no token found in settings — skipping{COL.X}")
         if _ngrok_url:
             print(f"\n{COL.G}🔗 Tunnel Ngrok       URL: {COL.X}{_ngrok_url}")
 
