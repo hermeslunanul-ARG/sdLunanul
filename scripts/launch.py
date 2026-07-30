@@ -385,6 +385,7 @@ if __name__ == '__main__':
         import subprocess as _sp
         _ngrok_url = None
         if ngrok_token:
+            print(f"{COL.lB}🔄 Starting ngrok tunnel...{COL.X}")
             # Start ngrok in background
             _sp.Popen(
                 ['ngrok', 'http', f'http://localhost:{tunnel_port}', '--log=stdout'],
