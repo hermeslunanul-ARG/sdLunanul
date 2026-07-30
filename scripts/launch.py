@@ -284,10 +284,7 @@ def setup_tunnels(tunnel_port):
         if current_token != ngrok_token:
             ipySys(f"ngrok config add-authtoken {ngrok_token}")
 
-        services.append(('Ngrok', {
-            'command': f"ngrok http http://localhost:{tunnel_port} --log stdout",
-            'pattern': r'https://[\w-]+\.(?:ngrok-free\.app|ngrok\.app|ngrok\.io)'
-        }))
+        # Ngrok handled separately via API (see launch block)
 
     # Check command availability
     available_tunnels = []
@@ -381,26 +378,33 @@ if __name__ == '__main__':
 
         print(f"🔧 WebUI: {COL.B}{UI}{COL.X}")
 
-        # ── Ngrok URL via local API (more reliable than parsing stdout) ──
+        # ── Ngrok: launch separately + poll API for URL ──
         import urllib.request as _ur
         import json as _js
         import time as _time
+        import subprocess as _sp
         _ngrok_url = None
-        for _attempt in range(6):  # Retry up to ~30s
-            try:
-                _req = _ur.urlopen('http://127.0.0.1:4040/api/tunnels', timeout=3)
-                _tunnels = _js.loads(_req.read()).get('tunnels', [])
-                for _t in _tunnels:
-                    _u = _t.get('public_url', '')
-                    if _u:
-                        _ngrok_url = _u
+        if ngrok_token:
+            # Start ngrok in background
+            _sp.Popen(
+                ['ngrok', 'http', f'http://localhost:{tunnel_port}', '--log=stdout'],
+                stdout=_sp.DEVNULL, stderr=_sp.DEVNULL
+            )
+            # Poll API for up to 30s
+            for _attempt in range(6):
+                try:
+                    _req = _ur.urlopen('http://127.0.0.1:4040/api/tunnels', timeout=3)
+                    for _t in _js.loads(_req.read()).get('tunnels', []):
+                        _u = _t.get('public_url', '')
+                        if _u:
+                            _ngrok_url = _u
+                            break
+                    if _ngrok_url:
                         break
-                if _ngrok_url:
-                    break
-            except Exception:
-                pass
-            if _attempt < 5:
-                _time.sleep(5)
+                except Exception:
+                    pass
+                if _attempt < 5:
+                    _time.sleep(5)
         if _ngrok_url:
             print(f"\n{COL.G}🔗 Tunnel Ngrok       URL: {COL.X}{_ngrok_url}")
 
